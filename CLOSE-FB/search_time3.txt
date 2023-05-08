@@ -1,0 +1,3 @@
+FileNumber:10000   avg_index_time:4.122840881347656
+FileNumber:10000  avg_search_time:0.13097596168518066
+--------------

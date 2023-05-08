@@ -1,0 +1,30 @@
+FileNumber:10000   avg_index_time:0.6700005531311035
+FileNumber:10000  avg_search_time:0.4826918601989746
+--------------
+FileNumber:20000   avg_index_time:1.3501187324523927
+FileNumber:20000  avg_search_time:0.970492148399353
+--------------
+FileNumber:30000   avg_index_time:2.1061697006225586
+FileNumber:30000  avg_search_time:1.5461499691009521
+--------------
+FileNumber:40000   avg_index_time:2.6383214950561524
+FileNumber:40000  avg_search_time:1.9304295301437377
+--------------
+FileNumber:50000   avg_index_time:3.135023355484009
+FileNumber:50000  avg_search_time:2.335618495941162
+--------------
+FileNumber:60000   avg_index_time:3.879589557647705
+FileNumber:60000  avg_search_time:2.8480244636535645
+--------------
+FileNumber:70000   avg_index_time:4.457579326629639
+FileNumber:70000  avg_search_time:3.2376263618469237
+--------------
+FileNumber:80000   avg_index_time:4.989461994171142
+FileNumber:80000  avg_search_time:3.626861643791199
+--------------
+FileNumber:90000   avg_index_time:5.585151624679566
+FileNumber:90000  avg_search_time:4.0775901794433596
+--------------
+FileNumber:100000   avg_index_time:6.198636817932129
+FileNumber:100000  avg_search_time:4.537159943580628
+--------------
