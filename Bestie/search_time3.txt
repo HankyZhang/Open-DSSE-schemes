@@ -1,4 +1,0 @@
-NumberKeyword:40
-avg_index_time:0.43673205375671387
-avg_search_time:0.17103219032287598
---------------

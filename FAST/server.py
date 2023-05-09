@@ -18,42 +18,32 @@ class searchServer:
     self.dic = GLOBAL_DATASET
     self.AESKey = '123456'
     self.fidKey = 'password'
+    self.encAlgo = encAlgo()  # H1 H2:sha256 F P:AES
     self.Count = {}
-    self.CDB = {}
-    self.GRP = {}
-    self.encAlgo = encAlgo()
-    self.lam = 20
-    self.slam = 21
 
-  def server_search(self, c_update, K_w, I_grp_w):
-    DD = []
-    self.GRP[I_grp_w] = []
-    i = c_update
+  def server_search(self, tw, stc, c):
+    delete = []
+    idList = []
+    i = c
     while i > 0:
-      LD = self.encAlgo.F3(K_w, str(i))[:41]
-      L = LD[:self.lam]
-      Ds = LD[-1 * (self.slam):]
-      D = self.dic[L][0]
-      C = self.dic[L][1]
-      value0 = self.encAlgo.x_o_r(D, Ds).zfill(21)[-21:]
-      op = value0[: 1]
-      X = value0[1 - 1 * self.slam:]
-      if op == '0':
-        DD.append(X)
-        for item in self.GRP[I_grp_w]:
-          for item in item.items():
-            if item[0] == X:
-              self.GRP[I_grp_w].pop(item)
-              break
+      u = self.encAlgo.H1(tw + stc)[:20]
+      e = self.dic[u]
+      mask = self.encAlgo.H2(tw + stc)[:38]
 
+      value = self.encAlgo.x_o_r(e, mask).zfill(38)
+      ind = int(value[:5])
+      op = value[5:6]
+      ki = value[-32:]
+      if op == '0':
+        delete.append(ind)
       else:
-        if X not in DD:
-          dict = {}
-          dict[X] = C
-          self.GRP[I_grp_w].append(dict)
+        if ind in delete:
+          delete.remove(ind)
+        else:
+          idList.append(ind)
+      stc = self.encAlgo.decrypt_oralce(ki, stc)
       i = i - 1
-    self.dic = {}
-    return self.GRP[I_grp_w]
+    return idList
 
 
 def delete_impl(data, wfile):
@@ -102,13 +92,13 @@ class RequestHandlerImpl(BaseHTTPRequestHandler):
       elif sender == 'data_user':
         if operation == "search":
           post_body = json.loads(post_body)
-          c_update, K_w, I_grp_w = post_body
-          GRP = searchServer(GLOBAL_DATASET).server_search(c_update, K_w, I_grp_w)
-          print(GRP)
-          response = json.dumps(GRP).encode()
+          tw, stc, c = post_body
+          idList = searchServer(GLOBAL_DATASET).server_search(tw, stc, c)
+          print(idList)
+          response = json.dumps(idList).encode()
           self.wfile.write(response)
 if __name__ == '__main__':
-  server_address = ("", 8000)
+  server_address = ("", 8100)
 
   httpd = HTTPServer(server_address, RequestHandlerImpl)
 

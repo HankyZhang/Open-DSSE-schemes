@@ -17,8 +17,6 @@ class CUpdate:
         self.KW = {}
         self.encAlgo = encAlgo()
 
-
-
     def Hd(self, ctr, h):
         for i in range(ctr):
             h = self.encAlgo.get_str_sha1_secret_str(h)[:20]
@@ -90,7 +88,7 @@ class CUpdate:
                     ctr = ctr - 1
                     self.KW.pop(keyword)
                 else:
-                    for j in range(10):
+                    for j in range(10000):
                         count = universal_dict[keyword][i + j]
 
                         stw = self.KW.get(keyword, 'NULL')
@@ -103,7 +101,7 @@ class CUpdate:
                         self.dataset = self.Merge(self.dataset, dic[keyword])
                     ctr = ctr - 1
                     self.KW.pop(keyword)
-                    i = i + 10
+                    i = i + 10000
 
         return self.dataset, ctr, number_circle
 

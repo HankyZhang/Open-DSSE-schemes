@@ -1,24 +1,28 @@
+import http.server
+import requests
 import numpy as np
 from encAlgo import *
+import  time
+import json
 import random
-import time
 import copy
 np.set_printoptions(suppress=True)
 np.set_printoptions(precision=3)
-
-file_data_arr =  [i for i in range(10000, 110000, 10000)]
+import multiprocessing
+# file_data_arr =  [i for i in range(10000, 110000, 10000)]
 
 class genIndex:
-    def __init__(self):
+    def __init__(self, ma):
         self.dic = []
         self.dataset = {}
         self.AESKey = '123456'
         self.fidKey = 'password'
-        self.keywordLength = 17
-        self.timeLength =29
+        self.keywordLength = 22
+        self.timeLength = 15
         self.lenCount = self.keywordLength + self.timeLength
         self.m_size = self.lenCount +3
         self.encMatrix = {}
+        self.ma = ma
 
     def initKey(self):
         self.keywordList = self.readDict()
@@ -41,7 +45,6 @@ class genIndex:
         return List
 
 
-
     def encID(self, fidKey, AESKey, count):   #加密ID
         value = encAlgo().encrypt_oracle(AESKey, count)
         key = encAlgo().F2(fidKey, count)[-10:]
@@ -58,7 +61,7 @@ class genIndex:
 
 
     def genTrilMatrix(self): #生成下三角随机矩阵
-        A1 = np.random.randint(1, 1000, size=(self.m_size, self.m_size)) #矩阵元素的大小
+        A1 = np.random.randint(1, 100, size=(self.m_size, self.m_size)) #矩阵元素的大小
         I = np.tril(A1)  # 下三角矩阵
         for i in range(self.m_size):
             I[i][i] = 1
@@ -78,12 +81,12 @@ class genIndex:
 
         indexCountList = list(binaryCount)
         transIndexvecotr = self.indexTrans(indexCountList)
-        rtransIndexArray = np.array(transIndexvecotr, dtype=object) * 100000  #随机数大小
+        rtransIndexArray = np.array(transIndexvecotr, dtype=np.float64) * 100000  #随机数大小
         Indexvector = rtransIndexArray.tolist()
 
         timeList1 = copy.deepcopy(timeList)
         transTimeVecotr = self.indexTrans(timeList1)
-        rtimeStampArray = np.array(transTimeVecotr, dtype=object) * 100000   #随机数大小
+        rtimeStampArray = np.array(transTimeVecotr, dtype=np.float64) * 100000   #随机数大小
         rtimevector = rtimeStampArray.tolist()
 
 
@@ -92,7 +95,7 @@ class genIndex:
         indexVector = list(map(int, indexVector))
 
         key_I = self.genTrilMatrix()
-        arrayIndexVector = np.array(indexVector)
+        arrayIndexVector = np.array(indexVector, dtype=np.float64)
         encIndex = self.enc(arrayIndexVector, key_I, key_I, self.M1, self.M2)  #是用矩阵加密
         return encIndex
 
@@ -113,7 +116,7 @@ class genIndex:
                 enc = encAlgo().F1(str(ctr), i)[:10]    #先生成上一次更新的Dw
                 Dw[i] = str(int(enc, 16) % 10000000000).zfill(10)
         for keyword in universal_dict:
-            for i in range(20):
+            for i in range(10000):
                 count = universal_dict[keyword][number_folder + i]
 
 
@@ -151,6 +154,34 @@ class genIndex:
             matrix = self.initIndexVector(i, Dw[i], timeList)  # 将每个关键字对应的key使用矩阵加密发送给服务器
             self.encMatrix[i] = matrix
 
+    def test2(self):
+        _processes = []
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        for index in range(10):
+            _process = multiprocessing.Process(target=self.long_running_function, args=(index, return_dict))
+            _process.start()
+            _processes.append(_process)
+        for _process in _processes:
+            _process.join()
+        self.encMatrix = {**self.encMatrix, **return_dict}
+        # pool = mp.Pool(mp.cpu_count())
+        # pool.map(self.long_running_function, [i for i in self.encMatrix.keys()])
+        # pool.close()
+
+    def long_running_function(self, t, return_dict):
+        timeList = ['0' for _ in range(self.timeLength)]
+        mydict = {}
+        t = t * self.ma
+        for i in range(self.ma):
+            m = t + i
+            matrix = self.initIndexVector(str(m), '12312412412', timeList)  # 将每个关键字对应的key使用矩阵加密发送给服务器
+            return_dict[str(m)] = matrix
+
+                # if (tril > 0):
+                #     key = str(int(tril)).zfill(10)
+                #     return key
+            # print(m)
 
 
     def Index(self, universal_dict, file_data):  #这个是运行的总出口~~
@@ -160,34 +191,67 @@ class genIndex:
         while i < file_data:
             self.chain(universal_dict, i, ctr)
             ctr = ctr + 1
-            i = i + 20
+            i = i + 10000
 
         time1 = ctr * 36
 
         timeStr = bin(time1)[2:].zfill(self.timeLength)  # [2:]是为了去掉0b, bin二进制, oct八进制, hex十六进制
         timeList = list(timeStr)
+        begin_time_process = time.time()
+        self.test2()
+        end_time_process = time.time()
+        print("time_gen_matrix", end_time_process - begin_time_process)
 
-        for i in self.dic:
-            if i != 'Subject':
-                matrix = self.initIndexVector(i, '12312412412', timeList)  # 将每个关键字对应的key使用矩阵加密发送给服务器
-                self.encMatrix[i] = matrix
+        # for i in self.dic:
+        #     if i != 'Subject':
+        #         matrix = self.initIndexVector(i, '12312412412', timeList)  # 将每个关键字对应的key使用矩阵加密发送给服务器
+        #         self.encMatrix[i] = matrix
 
         return self.dataset, self.encMatrix
 
 
+def gen_index(data):
+  # maL = [i for i in range(100, 1100, 100)]
+  maL = [100]
+  file_data_arr = [data]
+  for ma in maL:
+    for file_data in file_data_arr:
+      counter = 1
+
+      filename = "inverted_index_" + str(file_data) + ".txt"
+      universal_dict = {}
+      with open(filename, "r") as f:
+        for line in f:
+          values = line.split(" ")
+          universal_dict[values[0]] = []
+          for i in values[1:len(values)]:
+            universal_dict[values[0]].append(i)  # 所有的关键字对应文件
+      count = 0
+      total_consump = 0.0
+      while count < counter:
+        Sumtime_index = 0
+
+        begin_time_index = time.time()
+
+        dataset, Matrix = genIndex(ma).Index(universal_dict, file_data)
+
+        end_time_index = time.time()
+        Sumtime_index += (end_time_index - begin_time_index)
+        total_consump += Sumtime_index
+        count += 1
+
+      avg = (total_consump / counter)
+      print("avg_index_time:" + str(avg))
+    return dataset, Matrix
+
+def add_impl(data):
+  dataset, Matrix = gen_index(int(data))
+  for key in Matrix:
+      Matrix[key] = Matrix[key].tolist()
+  headers = {"Content-type": "application/json"}
+  response = requests.post(f"http://localhost:8082/data_owner/add/data", data=json.dumps([dataset, Matrix]), headers=headers)
+  if response.status_code == 200:
+      print(f"Success")
+
 if __name__=='__main__':
-    keyword = 'abandon'
-    a = genIndex()
-
-
-    for i in range(1):
-        fileFolder = './folder/document' + str(i)
-        Dw, Matrix = a.chain(fileFolder, i + 1)
-
-
-
-
-
-
-
-
+    add_impl(10000)

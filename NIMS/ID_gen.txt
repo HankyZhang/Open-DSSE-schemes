@@ -1,3 +1,0 @@
-Background 50 200 int
-Experience 50 200 int
-National 50 200 int
