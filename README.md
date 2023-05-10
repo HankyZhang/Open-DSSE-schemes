@@ -20,7 +20,7 @@ The main application demonstrates:
 4.Search over the server.
 
 
-**Usage**
+**How to use**
 
 python3 server.py
 python3 data_owner.py
