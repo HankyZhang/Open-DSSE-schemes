@@ -21,6 +21,7 @@ The main application demonstrates:
 
 
 **Usage**
+
 python3 server.py
 python3 data_owner.py
 python3 data_owner_client.py
