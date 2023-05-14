@@ -8,23 +8,23 @@ Implementation of DSSE schemes. For now, the repo includes a Python implementati
 4. S.-F. Sun, X. Yuan, J. K. Liu, R. Steinfeld, A. Sakzad, V. Vo, and S. Nepal, “Practical backward-secure searchable encryption from symmetric puncturable encryption,” in Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security, ser. CCS ’18. New York, NY, USA: Association for Computing Machinery, 2018, p. 763–7
 5. Zhang H, Xu C, Lu R, et al. Non-interactive Multi-client Searchable Symmetric Encryption with Small Client Storage[J]. arXiv preprint arXiv:2212.02859, 2022.
 
-Data set files with format. inverted_index_#####.txt contain the file identifiers of the Subject keyword. 
+Dataset files with format. inverted_index_#####.txt contain the file identifiers of the Subject keyword. 
 
 data_owner.py demonstrates the data owner side. 
 
 data_user.py demonstrates the data user side. 
 
-server.py allows to search over the enrypted database. 
+server.py demonstrates the server side.
 
 data_owner_client.py is the update application file. It can be executed by command, python3 data_owner_client.py. 
 
-The parmater in data_owner_client.py can control the total number of files to be updated.
+The parmater in data_owner_client.py can control the total number of files to be updated. http://IP_address/data_owner/add/#####
 
 
 
 **The main application demonstrates:**
 
-1.Setup with different data set 
+1.Setup with different datasets 
 
 2.Encryption with time measurement 
 
@@ -33,11 +33,12 @@ The parmater in data_owner_client.py can control the total number of files to be
 4.Search over the server.
 
 **How to use**
+You should change the IP_address and the port of these files to listen for incoming connections on a specified port:
 
-python3 server.py 
+Then, run 'python3 server.py' to keep the server listening for requests from data owner and data users.
 
-python3 data_owner.py 
+Run 'python3 data_owner.py' keep the data owner listening for requests from data users.
 
-python3 data_owner_client.py 
+Run 'python3 data_owner_client.py' to send update request.
 
-python3 data_user.py
+Run 'python3 data_user.py' to exacute search request.
